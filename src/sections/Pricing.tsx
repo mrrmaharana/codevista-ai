@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useMemo, useSyncExternalStore } from "react";
+import { useScrollReveal } from "../hooks/useScrollReveal";
 import { Container, Section } from "../components/layout/LayoutUtils";
 import { Button } from "../components/ui/Button";
 
@@ -174,9 +175,11 @@ BillingCycleText.displayName = "BillingCycleText";
 
 // --- Main Section (Parent never re-renders on toggle) ---
 export function Pricing() {
+  const { ref, isVisible } = useScrollReveal();
+
   return (
-    <Section id="pricing" className="bg-background relative">
-      <Container>
+    <Section id="pricing" ref={ref} className="bg-background relative">
+      <Container className={`transition-all duration-1000 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}>
         <div className="text-center mb-10">
           <h2 className="text-sm font-mono font-bold text-accent-yellow mb-2 uppercase tracking-widest">
             Pricing

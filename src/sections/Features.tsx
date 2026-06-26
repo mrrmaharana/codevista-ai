@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Container, Section } from "../components/layout/LayoutUtils";
+import { useScrollReveal } from "../hooks/useScrollReveal";
 
 const FEATURES = [
   {
@@ -60,11 +61,13 @@ export function Features() {
     }
   };
 
+  const { ref: sectionRef, isVisible } = useScrollReveal();
+
   return (
-    <Section id="features" className="bg-background relative">
+    <Section id="features" ref={sectionRef} className="bg-background relative">
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
       
-      <Container>
+      <Container className={`transition-all duration-1000 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}>
         <div className="text-center mb-16 max-w-3xl mx-auto">
           <h2 className="text-sm font-mono font-bold text-accent-yellow mb-2 uppercase tracking-widest">
             Architecture

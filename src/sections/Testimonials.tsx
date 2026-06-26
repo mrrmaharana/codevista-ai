@@ -1,6 +1,7 @@
 "use client";
 
 import { Container, Section } from "../components/layout/LayoutUtils";
+import { useScrollReveal } from "../hooks/useScrollReveal";
 
 const TESTIMONIALS = [
   {
@@ -27,11 +28,13 @@ const TESTIMONIALS = [
 ];
 
 export function Testimonials() {
+  const { ref, isVisible } = useScrollReveal();
+
   return (
-    <Section id="testimonials" className="bg-background relative overflow-hidden">
+    <Section id="testimonials" ref={ref} className="bg-background relative overflow-hidden">
       <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-secondary/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
       
-      <Container className="relative z-10">
+      <Container className={`relative z-10 transition-all duration-1000 ease-out delay-100 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}>
         <div className="text-center mb-16">
           <h2 className="text-sm font-mono font-bold text-accent-yellow mb-2 uppercase tracking-widest">
             Wall of Love

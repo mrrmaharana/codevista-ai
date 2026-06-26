@@ -1,10 +1,15 @@
+"use client";
+
 import { Container, Section } from "../components/layout/LayoutUtils";
 import { Button } from "../components/ui/Button";
+import { useScrollReveal } from "../hooks/useScrollReveal";
 
 export function CTABanner() {
+  const { ref, isVisible } = useScrollReveal();
+
   return (
-    <Section className="bg-background pt-8 pb-32">
-      <Container>
+    <Section ref={ref} className="bg-background pt-8 pb-32">
+      <Container className={`transition-all duration-1000 ease-out delay-200 ${isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
         <div className="relative rounded-3xl overflow-hidden bg-secondary border border-secondary p-12 md:p-20 text-center">
           {/* Animated Background Gradients & Glow */}
           <div className="absolute inset-0 z-0 opacity-80 mix-blend-screen">

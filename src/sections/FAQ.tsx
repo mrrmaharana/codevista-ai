@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Container, Section } from "../components/layout/LayoutUtils";
 import Image from "next/image";
+import { useScrollReveal } from "../hooks/useScrollReveal";
 
 const FAQS = [
   {
@@ -29,10 +30,11 @@ const FAQS = [
 
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const { ref, isVisible } = useScrollReveal();
 
   return (
-    <Section id="faq" className="bg-background relative">
-      <Container className="max-w-4xl">
+    <Section id="faq" ref={ref} className="bg-background relative">
+      <Container className={`max-w-4xl transition-all duration-1000 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}>
         <div className="text-center mb-16">
           <h2 className="text-sm font-mono font-bold text-accent-yellow mb-2 uppercase tracking-widest">
             FAQ
