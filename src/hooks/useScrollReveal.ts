@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export function useScrollReveal(threshold = 0.1, delay = 0) {
-  const ref = useRef<HTMLDivElement>(null);
+export function useScrollReveal<T extends HTMLElement = HTMLElement>(threshold = 0.1, delay = 0) {
+  const ref = useRef<T>(null);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -13,7 +13,6 @@ export function useScrollReveal(threshold = 0.1, delay = 0) {
           setTimeout(() => {
             setIsVisible(true);
           }, delay);
-          // Unobserve after revealing once for performance
           if (ref.current) observer.unobserve(ref.current);
         }
       },
@@ -23,13 +22,15 @@ export function useScrollReveal(threshold = 0.1, delay = 0) {
       }
     );
 
-    if (ref.current) {
-      observer.observe(ref.current);
+    const observedElement = ref.current;
+
+    if (observedElement) {
+      observer.observe(observedElement);
     }
 
     return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current);
+      if (observedElement) {
+        observer.unobserve(observedElement);
       }
     };
   }, [threshold, delay]);

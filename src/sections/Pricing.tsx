@@ -1,14 +1,10 @@
 "use client";
 
 import React, { useCallback, useMemo, useSyncExternalStore } from "react";
+import Image from "next/image";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 import { Container, Section } from "../components/layout/LayoutUtils";
 import { Button } from "../components/ui/Button";
-
-// --- State Isolation Architecture ---
-// We use a custom external store and useSyncExternalStore to ensure 
-// changing currency or billing cycle DOES NOT trigger a re-render of the parent Layout.
-// Only the strictly localized DOM nodes subscribe to this store.
 
 type Currency = "USD" | "EUR" | "INR";
 
@@ -19,9 +15,9 @@ interface PricingState {
 
 class PricingStore {
   private state: PricingState = { isAnnual: false, currency: "USD" };
-  private listeners = new Set<(state: PricingState) => void>();
+  private listeners = new Set<() => void>();
 
-  subscribe = (listener: (state: PricingState) => void) => {
+  subscribe = (listener: () => void) => {
     this.listeners.add(listener);
     return () => this.listeners.delete(listener);
   };
@@ -39,77 +35,82 @@ class PricingStore {
   };
 
   private emit = () => {
-    for (const listener of this.listeners) {
-      listener(this.state);
-    }
+    this.listeners.forEach((listener) => listener());
   };
 }
 
 const pricingStore = new PricingStore();
 
-// --- Data Logic (Multi-dimensional Matrix) ---
 const PRICING_MATRIX = {
   currencyConfig: {
-    USD: { symbol: "$", multiplier: 1, locale: "en-US" },
-    EUR: { symbol: "€", multiplier: 0.92, locale: "de-DE" },
-    INR: { symbol: "₹", multiplier: 83.5, locale: "en-IN" },
+    USD: { multiplier: 1, locale: "en-US" },
+    EUR: { multiplier: 0.92, locale: "de-DE" },
+    INR: { multiplier: 83.5, locale: "en-IN" },
   },
-  annualDiscount: 0.8, // 20% off
+  annualDiscount: 0.8,
   tiers: [
     {
       id: "starter",
-      name: "Starter",
-      baseRateUSD: 29,
-      features: ["Up to 10k queries/mo", "Community Support", "Basic Analytics"],
+      name: "Launch",
+      baseRateUSD: 39,
+      description: "For lean teams proving AI workflow value.",
+      features: ["25k agent actions", "5 connected tools", "Team dashboards", "Email support"],
     },
     {
       id: "pro",
-      name: "Professional",
-      baseRateUSD: 99,
+      name: "Scale",
+      baseRateUSD: 129,
       isPopular: true,
-      features: ["Up to 1M queries/mo", "Priority Support", "Advanced Analytics", "Custom Webhooks"],
+      description: "For engineering orgs standardizing delivery intelligence.",
+      features: ["1M agent actions", "Unlimited workflows", "Approval policies", "Priority support"],
     },
     {
       id: "enterprise",
       name: "Enterprise",
-      baseRateUSD: 299,
-      features: ["Unlimited queries", "24/7 SLA Support", "Dedicated Infrastructure", "Custom Models"],
+      baseRateUSD: 349,
+      description: "For regulated teams with custom controls.",
+      features: ["Custom action volume", "Private workspace", "SSO and SCIM", "Dedicated success pod"],
     },
   ],
 };
 
-// --- Isolated Components ---
-
-// 1. Controls Component: Updates the store without re-rendering parent
 const PricingControls = React.memo(() => {
   const state = useSyncExternalStore(pricingStore.subscribe, pricingStore.getSnapshot, pricingStore.getSnapshot);
 
-  const toggleBilling = useCallback(() => {
-    pricingStore.setAnnual(!state.isAnnual);
-  }, [state.isAnnual]);
+  const setMonthly = useCallback(() => {
+    pricingStore.setAnnual(false);
+  }, []);
 
-  const changeCurrency = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    pricingStore.setCurrency(e.target.value as Currency);
+  const setAnnual = useCallback(() => {
+    pricingStore.setAnnual(true);
+  }, []);
+
+  const changeCurrency = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
+    pricingStore.setCurrency(event.target.value as Currency);
   }, []);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12">
-      <div className="flex items-center gap-3 bg-white/5 p-1 rounded-full border border-white/10">
+    <div className="mb-12 flex flex-col items-center justify-center gap-5 sm:flex-row">
+      <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.045] p-1">
         <button
-          onClick={toggleBilling}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-            !state.isAnnual ? "bg-secondary text-light shadow-md" : "text-light/60 hover:text-light"
+          type="button"
+          aria-pressed={!state.isAnnual}
+          onClick={setMonthly}
+          className={`rounded-md px-4 py-2 text-sm font-semibold transition-all hover:-translate-y-0.5 ${
+            !state.isAnnual ? "bg-accent-yellow text-background shadow-md" : "text-light/60 hover:bg-white/[0.08] hover:text-light"
           }`}
         >
           Monthly
         </button>
         <button
-          onClick={toggleBilling}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-            state.isAnnual ? "bg-secondary text-light shadow-md" : "text-light/60 hover:text-light"
+          type="button"
+          aria-pressed={state.isAnnual}
+          onClick={setAnnual}
+          className={`rounded-md px-4 py-2 text-sm font-semibold transition-all hover:-translate-y-0.5 ${
+            state.isAnnual ? "bg-accent-yellow text-background shadow-md" : "text-light/60 hover:bg-white/[0.08] hover:text-light"
           }`}
         >
-          Annual <span className="text-accent-yellow ml-1">-20%</span>
+          Annual <span className={state.isAnnual ? "text-background/70" : "text-accent-yellow"}>-20%</span>
         </button>
       </div>
 
@@ -117,120 +118,110 @@ const PricingControls = React.memo(() => {
         <select
           value={state.currency}
           onChange={changeCurrency}
-          className="appearance-none bg-white/5 border border-white/10 text-light py-2 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary font-mono"
+          className="appearance-none rounded-lg border border-white/10 bg-white/[0.045] py-2 pl-4 pr-10 font-mono text-light transition hover:border-accent-cyan/45 focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="USD">USD ($)</option>
-          <option value="EUR">EUR (€)</option>
-          <option value="INR">INR (₹)</option>
+          <option value="EUR">EUR</option>
+          <option value="INR">INR</option>
         </select>
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-          ▼
-        </div>
+        <Image src="/SVGs/chevron-down.svg" alt="" width={16} height={16} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 invert opacity-60" />
       </div>
     </div>
   );
 });
 PricingControls.displayName = "PricingControls";
 
-// 2. Localized Price Display Node (Strictly isolates text re-renders)
 const PriceValue = React.memo(({ baseRateUSD }: { baseRateUSD: number }) => {
   const { isAnnual, currency } = useSyncExternalStore(pricingStore.subscribe, pricingStore.getSnapshot, pricingStore.getSnapshot);
 
   const calculatedPrice = useMemo(() => {
     const config = PRICING_MATRIX.currencyConfig[currency];
-    const rate = baseRateUSD * config.multiplier;
-    const finalRate = isAnnual ? rate * PRICING_MATRIX.annualDiscount : rate;
-    
-    // Monthly * 12 * 0.8 is the requirement for annual. 
-    // Wait, the prompt says: "Annual Pricing: Monthly * 12 * 0.8" 
-    // And "Only price text should update".
-    // If it displays annual total, we show Monthly * 12 * 0.8.
-    // Let's display the monthly equivalent for annual, or the full annual price?
-    // "Annual Pricing: Monthly × 12 × 0.8" implies the price shown is the yearly total.
-    
-    const displayValue = isAnnual ? finalRate * 12 : finalRate;
+    const monthlyRate = baseRateUSD * config.multiplier;
+    const displayValue = isAnnual ? monthlyRate * 12 * PRICING_MATRIX.annualDiscount : monthlyRate;
 
     return new Intl.NumberFormat(config.locale, {
       style: "currency",
-      currency: currency,
+      currency,
       maximumFractionDigits: 0,
     }).format(displayValue);
   }, [baseRateUSD, isAnnual, currency]);
 
   return (
-    <span className="text-4xl md:text-5xl font-mono font-bold text-light">
+    <span key={`${currency}-${isAnnual}-${calculatedPrice}`} className="inline-block animate-price-pop font-mono text-4xl font-black text-light md:text-5xl">
       {calculatedPrice}
     </span>
   );
 });
 PriceValue.displayName = "PriceValue";
 
-
 const BillingCycleText = React.memo(() => {
   const { isAnnual } = useSyncExternalStore(pricingStore.subscribe, pricingStore.getSnapshot, pricingStore.getSnapshot);
-  return <span className="text-light/50 text-sm ml-2">/{isAnnual ? 'yr' : 'mo'}</span>;
+  return <span className="ml-2 text-sm text-light/50">/{isAnnual ? "yr" : "mo"}</span>;
 });
 BillingCycleText.displayName = "BillingCycleText";
 
-
-// --- Main Section (Parent never re-renders on toggle) ---
 export function Pricing() {
-  const { ref, isVisible } = useScrollReveal();
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
 
   return (
-    <Section id="pricing" ref={ref} className="bg-background relative">
+    <Section id="pricing" ref={ref} className="relative bg-background" aria-labelledby="pricing-title">
       <Container className={`transition-all duration-1000 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}>
-        <div className="text-center mb-10">
-          <h2 className="text-sm font-mono font-bold text-accent-yellow mb-2 uppercase tracking-widest">
-            Pricing
+        <div className="mx-auto mb-10 max-w-3xl text-center">
+          <p className="mb-3 font-mono text-sm font-bold uppercase tracking-[0.28em] text-accent-yellow">Pricing</p>
+          <h2 id="pricing-title" className="font-mono text-3xl font-black text-light md:text-5xl">
+            Simple plans for serious AI operations.
           </h2>
-          <h3 className="text-3xl md:text-5xl font-mono font-bold text-light mb-6">
-            Predictable scale.
-          </h3>
+          <p className="mt-5 text-lg leading-8 text-light/62">
+            Start small, scale into governed automation, and keep every action visible to the people who own it.
+          </p>
         </div>
 
-        {/* State Isolated Controls */}
         <PricingControls />
 
-        {/* Pricing Matrix Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {PRICING_MATRIX.tiers.map((tier) => (
-            <div
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-3">
+          {PRICING_MATRIX.tiers.map((tier, index) => (
+            <article
               key={tier.id}
-              className={`
-                relative p-8 rounded-2xl border flex flex-col
-                ${tier.isPopular ? "bg-white/5 border-accent-yellow/50 shadow-[0_0_30px_rgba(255,200,1,0.1)]" : "bg-white/[0.02] border-white/10"}
-              `}
+              style={{ transitionDelay: `${index * 80}ms` }}
+              className={`hover-lift relative flex flex-col rounded-xl border p-7 transition-all duration-700 ${
+                tier.isPopular
+                  ? "border-accent-yellow/55 bg-white/[0.08] shadow-[0_0_36px_rgba(255,210,63,0.12)]"
+                  : "border-white/10 bg-white/[0.035] hover:border-accent-cyan/35"
+              }`}
             >
               {tier.isPopular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent-yellow text-background text-xs font-bold px-3 py-1 rounded-full font-mono uppercase tracking-widest">
-                  Most Popular
+                <div className="absolute -top-3 left-6 rounded-full bg-accent-yellow px-3 py-1 font-mono text-xs font-bold uppercase tracking-widest text-background">
+                  Recommended
                 </div>
               )}
-              
-              <h4 className="text-xl font-mono font-bold text-light mb-2">{tier.name}</h4>
-              
+
+              <h3 className="mb-2 font-mono text-2xl font-bold text-light">{tier.name}</h3>
+              <p className="mb-6 min-h-12 text-sm leading-6 text-light/58">{tier.description}</p>
+
               <div className="mb-6 flex items-baseline">
-                {/* State Isolated Price Node */}
                 <PriceValue baseRateUSD={tier.baseRateUSD} />
                 <BillingCycleText />
               </div>
 
-              <ul className="flex flex-col gap-4 mb-8 flex-1">
-                {tier.features.map((feature, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <div className="mt-1 w-4 h-4 rounded-full bg-secondary/30 flex items-center justify-center shrink-0">
-                      <div className="w-2 h-2 rounded-full bg-accent-yellow" />
+              <ul className="mb-8 flex flex-1 flex-col gap-4">
+                {tier.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-3">
+                    <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-mint/12">
+                      <Image src="/SVGs/chevron-right.svg" alt="" width={12} height={12} className="invert opacity-80" />
                     </div>
-                    <span className="text-light/80 text-sm">{feature}</span>
+                    <span className="text-sm text-light/78">{feature}</span>
                   </li>
                 ))}
               </ul>
 
-              <Button variant={tier.isPopular ? "primary" : "outline"} className="w-full">
-                {tier.id === 'enterprise' ? 'Contact Sales' : 'Start Trial'}
+              <Button
+                href={tier.id === "enterprise" ? "mailto:sales@codevista.ai?subject=CodeVista%20Enterprise%20Demo" : "#contact"}
+                variant={tier.isPopular ? "primary" : "outline"}
+                className="w-full"
+              >
+                {tier.id === "enterprise" ? "Contact sales" : "Start trial"}
               </Button>
-            </div>
+            </article>
           ))}
         </div>
       </Container>

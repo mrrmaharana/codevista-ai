@@ -1,12 +1,15 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #172B36;
-  --color-secondary: #114C5A;
-  --color-light: #F1F6F4;
-  --color-soft-bg: #D9E8E2;
-  --color-accent-yellow: #FFC801;
-  --color-accent-orange: #FF9932;
+  --color-background: #071113;
+  --color-surface: #0c1b1d;
+  --color-secondary: #0f6670;
+  --color-light: #f6fbf8;
+  --color-soft-bg: #cfe7df;
+  --color-accent-yellow: #ffd23f;
+  --color-accent-orange: #ff7a3d;
+  --color-accent-cyan: #5de2e7;
+  --color-accent-mint: #82f7bf;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
@@ -22,11 +25,18 @@ body {
   overflow-x: hidden;
   margin: 0;
   padding: 0;
+  background:
+    radial-gradient(circle at top left, rgba(93, 226, 231, 0.16), transparent 28rem),
+    linear-gradient(180deg, #071113 0%, #0a1517 48%, #071113 100%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Base custom scrollbar */
+::selection {
+  background: var(--color-accent-yellow);
+  color: var(--color-background);
+}
+
 ::-webkit-scrollbar {
   width: 10px;
 }
@@ -41,17 +51,43 @@ body {
   background: var(--color-soft-bg); 
 }
 
-/* Scroll Animation Utilities */
 .reveal-hidden {
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(34px) scale(0.98);
   transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
 .reveal-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
+}
+
+.glass-panel {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.035));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(20px);
+}
+
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 22px 65px rgba(0, 0, 0, 0.24);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 @theme inline {
@@ -60,6 +96,9 @@ body {
   --animate-float: float 6s ease-in-out infinite;
   --animate-pulse-glow: pulse-glow 4s ease-in-out infinite;
   --animate-reveal-left: reveal-left 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-marquee: marquee var(--marquee-duration, 24s) linear infinite;
+  --animate-scan: scan 3.8s ease-in-out infinite;
+  --animate-price-pop: price-pop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   
   @keyframes fade-in-up {
     0% {
@@ -97,6 +136,28 @@ body {
     75%, 100% {
       transform: scale(2);
       opacity: 0;
+    }
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @keyframes scan {
+    0%, 100% { transform: translateY(-10%); opacity: 0; }
+    15%, 75% { opacity: 1; }
+    50% { transform: translateY(220%); }
+  }
+
+  @keyframes price-pop {
+    0% {
+      opacity: 0;
+      transform: translateY(10px) scale(0.98);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
     }
   }
 }

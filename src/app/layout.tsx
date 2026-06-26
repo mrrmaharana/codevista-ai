@@ -13,15 +13,30 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Next-Gen AI Automation Platform",
-  description: "Advanced AI-driven data automation platform.",
+  metadataBase: new URL("https://codevista.ai"),
+  title: {
+    default: "CodeVista AI | Premium AI SaaS Automation Platform",
+    template: "%s | CodeVista AI",
+  },
+  description: "CodeVista AI turns fragmented engineering data into governed automations, AI copilots, and executive-ready insight for software teams.",
+  keywords: [
+    "AI SaaS platform",
+    "developer automation",
+    "engineering analytics",
+    "AI workflow automation",
+    "CodeVista AI",
+  ],
   openGraph: {
-    title: "Next-Gen AI Automation Platform",
-    description: "Advanced AI-driven data automation platform.",
+    title: "CodeVista AI | Premium AI SaaS Automation Platform",
+    description: "Launch governed AI workflows, analytics, and developer copilots from one premium SaaS workspace.",
+    url: "https://codevista.ai",
+    siteName: "CodeVista AI",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
+    title: "CodeVista AI",
+    description: "AI automation for software teams that need speed, governance, and polished insight.",
   },
   robots: {
     index: true,
@@ -30,7 +45,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   alternates: {
     canonical: "https://codevista.ai",
-  }
+  },
 };
 
 export const viewport: Viewport = {
@@ -47,24 +62,24 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${jetbrainsMono.variable} scroll-smooth antialiased h-full`}
     >
-      <body className="min-h-full flex flex-col bg-background text-light font-sans selection:bg-accent-yellow selection:text-background">
+      <body className="min-h-full flex flex-col bg-background text-light font-sans">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "SoftwareApplication",
-              "name": "CodeVista AI",
-              "operatingSystem": "Web",
-              "applicationCategory": "BusinessApplication",
-              "offers": {
+              name: "CodeVista AI",
+              operatingSystem: "Web",
+              applicationCategory: "BusinessApplication",
+              offers: {
                 "@type": "AggregateOffer",
-                "priceCurrency": "USD",
-                "lowPrice": "29",
-                "highPrice": "299",
-                "offerCount": "3"
+                priceCurrency: "USD",
+                lowPrice: "39",
+                highPrice: "349",
+                offerCount: "3",
               },
-              "description": "Advanced AI-driven data automation platform for engineering teams."
+              description: "Premium AI SaaS platform for engineering analytics, automation, and workflow governance.",
             }),
           }}
         />

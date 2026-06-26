@@ -1,95 +1,85 @@
 "use client";
 
 import { useState } from "react";
-import { Container, Section } from "../components/layout/LayoutUtils";
 import Image from "next/image";
+import { Container, Section } from "../components/layout/LayoutUtils";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 
 const FAQS = [
   {
     id: "faq-1",
-    question: "How does the pricing scale with my data?",
-    answer: "Our pricing is tiered based on query volume and features. You are only billed for what you use above your tier's base allowance. For enterprise needs, we offer custom volumetric discounts."
+    question: "Can CodeVista act on production systems?",
+    answer: "Yes, but only through the rules you define. Sensitive workflows can require approvals, scoped permissions, and full audit logs before any action runs.",
   },
   {
     id: "faq-2",
-    question: "Do you offer SOC2 compliance?",
-    answer: "Yes, CodeVista is SOC2 Type II compliant. All data is encrypted at rest using AES-256 and in transit via TLS 1.3. We undergo regular third-party penetration testing."
+    question: "How fast can a team launch the first workflow?",
+    answer: "Most teams connect their first source and publish a guided workflow in the same session. Larger rollouts usually start with one team, then expand by workspace.",
   },
   {
     id: "faq-3",
-    question: "Can I deploy on-premise?",
-    answer: "On-premise and VPC deployments are strictly available on our Enterprise tier. This includes dedicated support and specialized infrastructure provisioning."
+    question: "Does it replace our existing tools?",
+    answer: "No. CodeVista sits above tools like GitHub, Jira, Slack, Datadog, and docs systems so your teams keep working where they already work.",
   },
   {
     id: "faq-4",
-    question: "What happens if I exceed my monthly query limit?",
-    answer: "You will not be cut off. We provide a soft limit and will notify you when you reach 80% and 100% of your usage. Subsequent queries are billed at a flat overage rate."
-  }
+    question: "Is enterprise deployment available?",
+    answer: "Enterprise customers can use SSO, SCIM, private workspaces, custom retention rules, and dedicated onboarding for regulated environments.",
+  },
 ];
 
 export function FAQ() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-  const { ref, isVisible } = useScrollReveal();
+  const [openIndex, setOpenIndex] = useState(0);
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
 
   return (
-    <Section id="faq" ref={ref} className="bg-background relative">
+    <Section id="faq" ref={ref} className="relative bg-background" aria-labelledby="faq-title">
       <Container className={`max-w-4xl transition-all duration-1000 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}>
-        <div className="text-center mb-16">
-          <h2 className="text-sm font-mono font-bold text-accent-yellow mb-2 uppercase tracking-widest">
-            FAQ
+        <div className="mb-12 text-center">
+          <p className="mb-3 font-mono text-sm font-bold uppercase tracking-[0.28em] text-accent-yellow">FAQ</p>
+          <h2 id="faq-title" className="font-mono text-3xl font-black text-light md:text-5xl">
+            Questions teams ask before they switch on AI.
           </h2>
-          <h3 className="text-3xl md:text-5xl font-mono font-bold text-light mb-6">
-            Common Questions
-          </h3>
         </div>
 
-        <div className="space-y-4" role="tablist">
+        <div className="space-y-4">
           {FAQS.map((faq, index) => {
             const isOpen = openIndex === index;
-            
+
             return (
-              <div 
-                key={faq.id} 
-                className={`border rounded-xl transition-colors duration-300 ${isOpen ? "border-white/20 bg-white/5" : "border-white/5 bg-transparent"}`}
+              <article
+                key={faq.id}
+                className={`rounded-xl border transition-all duration-300 ${
+                  isOpen ? "border-accent-cyan/40 bg-white/[0.07]" : "border-white/10 bg-white/[0.025] hover:border-white/[0.22] hover:bg-white/[0.045]"
+                }`}
               >
                 <button
                   id={`accordion-button-${faq.id}`}
                   aria-expanded={isOpen}
                   aria-controls={`accordion-panel-${faq.id}`}
-                  role="tab"
-                  className="w-full flex items-center justify-between p-6 text-left focus:outline-none focus:ring-2 focus:ring-accent-yellow rounded-xl"
-                  onClick={() => setOpenIndex(isOpen ? null : index)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setOpenIndex(isOpen ? null : index);
-                    }
-                  }}
+                  className="group flex w-full items-center justify-between gap-5 rounded-xl p-5 text-left focus:outline-none focus:ring-2 focus:ring-accent-yellow sm:p-6"
+                  onClick={() => setOpenIndex(isOpen ? -1 : index)}
                 >
-                  <span className="font-mono font-semibold text-lg text-light pr-8">{faq.question}</span>
-                  <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${isOpen ? "bg-accent-yellow text-background" : "bg-white/10 text-light"}`}>
-                    <Image 
-                      src="/SVGs/chevron-down.svg" 
-                      alt="Toggle" 
-                      width={16} 
-                      height={16} 
-                      className={`transition-transform duration-300 ${isOpen ? "rotate-180 brightness-0" : "invert"}`} 
+                  <span className="font-mono text-base font-semibold text-light sm:text-lg">{faq.question}</span>
+                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-all ${isOpen ? "bg-accent-yellow" : "bg-white/[0.08] group-hover:bg-white/[0.14]"}`}>
+                    <Image
+                      src="/SVGs/chevron-down.svg"
+                      alt=""
+                      width={16}
+                      height={16}
+                      className={`transition-transform duration-300 ${isOpen ? "rotate-180 brightness-0" : "invert opacity-80"}`}
                     />
-                  </div>
+                  </span>
                 </button>
-                
-                <div 
+
+                <div
                   id={`accordion-panel-${faq.id}`}
-                  role="tabpanel"
                   aria-labelledby={`accordion-button-${faq.id}`}
-                  className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"}`}
+                  className={`overflow-hidden transition-all duration-300 ease-out ${isOpen ? "max-h-52 opacity-100" : "max-h-0 opacity-0"}`}
                 >
-                  <div className="p-6 pt-0 text-light/70 text-base leading-relaxed">
-                    {faq.answer}
-                  </div>
+                  <p className="px-5 pb-6 leading-7 text-light/65 sm:px-6">{faq.answer}</p>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>

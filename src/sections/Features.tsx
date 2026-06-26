@@ -1,162 +1,119 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { Container, Section } from "../components/layout/LayoutUtils";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 
 const FEATURES = [
   {
-    id: 1,
-    title: "Real-time Processing",
-    description: "Process massive datasets in real-time with sub-millisecond latency. Our distributed engine scales automatically to handle any volume.",
-    icon: "/SVGs/arrow-path.svg",
-    colSpan: "md:col-span-2 md:row-span-2",
-  },
-  {
-    id: 2,
-    title: "Predictive Analytics",
-    description: "Anticipate trends before they happen using our advanced machine learning models trained specifically on enterprise telemetry.",
-    icon: "/SVGs/chart-pie.svg",
-    colSpan: "md:col-span-1 md:row-span-1",
-  },
-  {
-    id: 3,
-    title: "Seamless Integration",
-    description: "Connect to any existing database, API, or data warehouse with zero configuration. We support over 100+ native connectors.",
+    title: "Context Engine",
+    eyebrow: "Connect",
+    description: "Unifies commits, incidents, tickets, docs, and customer signals into one governed knowledge layer.",
     icon: "/SVGs/link-solid.svg",
-    colSpan: "md:col-span-1 md:row-span-1",
+    stat: "180+ sources",
+    className: "md:col-span-2",
   },
   {
-    id: 4,
-    title: "Advanced Security",
-    description: "Enterprise-grade encryption at rest and in transit. SOC2 Type II certified with role-based access control out of the box.",
+    title: "AI Runbooks",
+    eyebrow: "Act",
+    description: "Turns recurring engineering work into approval-based automations with audit trails attached.",
+    icon: "/SVGs/cog-8-tooth.svg",
+    stat: "64% less toil",
+    className: "",
+  },
+  {
+    title: "Delivery Radar",
+    eyebrow: "Predict",
+    description: "Surfaces release risks, blocked work, and trend changes before they become status meetings.",
+    icon: "/SVGs/chart-pie.svg",
+    stat: "3.4x faster readouts",
+    className: "",
+  },
+  {
+    title: "Policy Guardrails",
+    eyebrow: "Govern",
+    description: "Routes sensitive actions through the right humans, teams, and compliance rules automatically.",
     icon: "/SVGs/cube-16-solid.svg",
-    colSpan: "md:col-span-2 md:row-span-1",
+    stat: "Zero blind actions",
+    className: "md:col-span-2",
   },
 ];
 
+const INTEGRATIONS = ["GitHub", "Linear", "Jira", "Slack", "Datadog", "Snowflake", "Sentry", "Notion"];
+
 export function Features() {
-  const [activeIndex, setActiveIndex] = useState<number | null>(0);
-  const [isMobile, setIsMobile] = useState<boolean>(true);
-  
-  useEffect(() => {
-    // Check initial window size and handle resize
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile(); // Initial check
-    
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
-
-  // For accordion, toggle open/close. For desktop bento, hover sets active.
-  const handleInteraction = (index: number) => {
-    if (isMobile) {
-      setActiveIndex(activeIndex === index ? null : index);
-    } else {
-      setActiveIndex(index);
-    }
-  };
-
-  const { ref: sectionRef, isVisible } = useScrollReveal();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
 
   return (
-    <Section id="features" ref={sectionRef} className="bg-background relative">
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-      
+    <Section id="features" ref={ref} className="bg-background" aria-labelledby="features-title">
       <Container className={`transition-all duration-1000 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}>
-        <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h2 className="text-sm font-mono font-bold text-accent-yellow mb-2 uppercase tracking-widest">
-            Architecture
-          </h2>
-          <h3 className="text-3xl md:text-5xl font-mono font-bold text-light mb-6">
-            Engineered for scale. <br /> Designed for speed.
-          </h3>
-          <p className="text-light/60 text-lg">
-            A complete ecosystem that gives you the tools to build, deploy, and scale complex AI workflows without the usual infrastructure headaches.
+        <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
+          <div>
+            <p className="mb-3 font-mono text-sm font-bold uppercase tracking-[0.28em] text-accent-yellow">Platform</p>
+            <h2 id="features-title" className="font-mono text-3xl font-black leading-tight text-light sm:text-5xl">
+              Built for teams that need AI to be fast and accountable.
+            </h2>
+          </div>
+          <p className="max-w-2xl text-lg leading-8 text-light/65">
+            Every interaction is designed for repeat work: scan quickly, hover for more signal, approve with confidence, and keep the audit trail close.
           </p>
         </div>
 
-        {/* Responsive Container: Switches layout based on CSS media queries, but state is shared */}
-        <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-3 gap-4 md:gap-6 md:h-[600px]">
+        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-3 md:auto-rows-[260px]">
           {FEATURES.map((feature, index) => {
             const isActive = activeIndex === index;
-            
-            return (
-              <div 
-                key={feature.id}
-                className={`
-                  relative rounded-2xl border border-white/5 overflow-hidden transition-all duration-300 ease-out
-                  ${isMobile ? "flex flex-col" : feature.colSpan}
-                  ${isActive ? "bg-white/5 border-white/20 shadow-[0_0_30px_rgba(17,76,90,0.3)]" : "bg-white/[0.02] hover:bg-white/[0.04]"}
-                `}
-                onMouseEnter={() => !isMobile && handleInteraction(index)}
-                onClick={() => isMobile && handleInteraction(index)}
-              >
-                {/* Mobile Header (Accordion Trigger) */}
-                {isMobile && (
-                  <div className="flex items-center justify-between p-6 cursor-pointer">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${isActive ? "bg-secondary text-light" : "bg-white/5"}`}>
-                        <Image src={feature.icon} alt={feature.title} width={24} height={24} className="invert" />
-                      </div>
-                      <h4 className="font-mono font-bold text-lg text-light">{feature.title}</h4>
-                    </div>
-                    <Image 
-                      src="/SVGs/chevron-down.svg" 
-                      alt="Toggle" 
-                      width={20} 
-                      height={20} 
-                      className={`invert transition-transform duration-300 ${isActive ? "rotate-180" : ""}`} 
-                    />
-                  </div>
-                )}
 
-                {/* Content Area (Responsive) */}
-                <div 
-                  className={`
-                    transition-all duration-300 ease-out overflow-hidden
-                    ${isMobile 
-                      ? (isActive ? "max-h-96 opacity-100" : "max-h-0 opacity-0") 
-                      : "h-full flex flex-col p-8 opacity-100"
-                    }
-                  `}
-                >
-                  <div className={isMobile ? "px-6 pb-6 pt-0" : "flex-1 flex flex-col"}>
-                    {!isMobile && (
-                      <div className="flex items-center justify-between mb-6">
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${isActive ? "bg-secondary" : "bg-white/5"}`}>
-                          <Image src={feature.icon} alt={feature.title} width={28} height={28} className="invert" />
-                        </div>
-                        <div className={`w-10 h-10 rounded-full border border-white/10 flex items-center justify-center transition-all ${isActive ? "opacity-100 translate-x-0 bg-white/10" : "opacity-0 -translate-x-2"}`}>
-                          <Image src="/SVGs/arrow-trending-up.svg" alt="Arrow" width={16} height={16} className="invert" />
-                        </div>
-                      </div>
-                    )}
-                    
-                    {!isMobile && (
-                      <h4 className="font-mono font-bold text-2xl text-light mb-4">{feature.title}</h4>
-                    )}
-                    
-                    <p className={`text-light/60 ${!isMobile && feature.colSpan.includes("col-span-2") ? "text-lg max-w-md" : "text-base"} leading-relaxed`}>
-                      {feature.description}
-                    </p>
-                    
-                    {!isMobile && feature.colSpan.includes("col-span-2") && (
-                      <div className={`mt-auto pt-8 transition-all duration-500 delay-100 ${isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-                        <div className="h-32 w-full bg-gradient-to-t from-background to-transparent rounded-lg border border-white/5 relative overflow-hidden flex items-end justify-center">
-                          <div className="absolute w-[200%] h-1 bg-accent-yellow top-1/2 left-0 shadow-[0_0_15px_#FFC801] animate-pulse" />
-                        </div>
-                      </div>
-                    )}
+            return (
+              <article
+                key={feature.title}
+                className={`hover-lift group relative overflow-hidden rounded-xl border p-6 md:p-7 ${feature.className} ${
+                  isActive
+                    ? "border-accent-cyan/45 bg-white/[0.075]"
+                    : "border-white/10 bg-white/[0.035] hover:border-white/25 hover:bg-white/[0.06]"
+                }`}
+                onMouseEnter={() => setActiveIndex(index)}
+                onFocus={() => setActiveIndex(index)}
+                tabIndex={0}
+              >
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent-cyan/80 to-transparent opacity-0 transition group-hover:opacity-100" />
+                <div className="flex h-full flex-col">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white/[0.07] transition group-hover:bg-accent-yellow">
+                      <Image src={feature.icon} alt="" width={24} height={24} className="invert transition group-hover:brightness-0 group-hover:invert-0" />
+                    </div>
+                    <span className="rounded-full border border-white/10 px-3 py-1 font-mono text-xs text-light/55 transition group-hover:border-accent-yellow/40 group-hover:text-accent-yellow">
+                      {feature.eyebrow}
+                    </span>
+                  </div>
+
+                  <div className="mt-auto pt-8">
+                    <h3 className="font-mono text-2xl font-bold text-light">{feature.title}</h3>
+                    <p className="mt-3 max-w-xl leading-7 text-light/62">{feature.description}</p>
+                    <div className="mt-6 flex items-center justify-between border-t border-white/10 pt-4">
+                      <span className="font-mono text-sm text-accent-mint">{feature.stat}</span>
+                      <Image src="/SVGs/chevron-right.svg" alt="" width={18} height={18} className="invert opacity-45 transition group-hover:translate-x-1 group-hover:opacity-100" />
+                    </div>
                   </div>
                 </div>
-              </div>
+              </article>
             );
           })}
+        </div>
+
+        <div className="group mt-8 overflow-hidden rounded-xl border border-white/10 bg-white/[0.035] py-4 [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)] sm:[--marquee-duration:26s] md:[--marquee-duration:30s]">
+          <div className="flex w-max animate-marquee gap-3 px-3 transition-transform duration-500 ease-out group-hover:[animation-play-state:paused]">
+            {[...INTEGRATIONS, ...INTEGRATIONS].map((name, index) => (
+              <div
+                key={`${name}-${index}`}
+                className="flex min-w-max items-center gap-2 rounded-lg border border-white/10 bg-background/50 px-4 py-3 text-sm text-light/65 transition-all duration-300 hover:-translate-y-1 hover:border-accent-cyan/45 hover:bg-white/[0.07] hover:text-light"
+              >
+                <Image src={index % 2 === 0 ? "/SVGs/link.svg" : "/SVGs/arrow-path.svg"} alt="" width={16} height={16} className="invert opacity-60" />
+                {name}
+              </div>
+            ))}
+          </div>
         </div>
       </Container>
     </Section>
