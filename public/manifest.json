@@ -1,0 +1,9 @@
+{
+  "name": "Next-Gen AI Automation Platform",
+  "short_name": "CodeVista AI",
+  "description": "Advanced AI-driven data automation platform.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#172B36",
+  "theme_color": "#172B36"
+}
