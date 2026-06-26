@@ -1,67 +1,61 @@
-import { Container } from "./LayoutUtils";
 import Link from "next/link";
 import Image from "next/image";
+import { Container } from "./LayoutUtils";
+
+const FOOTER_GROUPS = [
+  { title: "Product", links: ["Features", "Pricing", "Integrations", "Security"] },
+  { title: "Company", links: ["About", "Customers", "Careers", "Contact"] },
+  { title: "Resources", links: ["Docs", "API", "Playbooks", "Status"] },
+];
 
 export function Footer() {
   return (
-    <footer className="bg-background border-t border-white/5 pt-16 pb-8">
+    <footer className="border-t border-white/[0.08] bg-background pt-14 pb-8">
       <Container>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
-          <div className="col-span-2 lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4 group inline-flex">
-              <div className="w-8 h-8 rounded-lg bg-accent-yellow flex items-center justify-center transition-transform group-hover:scale-105">
-                <span className="font-mono font-bold text-background text-sm leading-none">CV</span>
+        <div className="grid gap-10 md:grid-cols-[1.3fr_1fr_1fr_1fr]">
+          <div>
+            <Link href="/" className="group mb-5 inline-flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-yellow transition-all group-hover:rotate-3 group-hover:shadow-[0_0_26px_rgba(255,210,63,0.35)]">
+                <Image src="/SVGs/cube-16-solid.svg" alt="" width={20} height={20} className="brightness-0" />
               </div>
-              <span className="font-mono font-bold text-lg tracking-tight">CodeVista</span>
+              <span className="font-mono text-xl font-bold tracking-tight">CodeVista AI</span>
             </Link>
-            <p className="text-light/60 text-sm max-w-xs mb-6">
-              The premium AI-driven data automation platform for modern engineering teams.
+            <p className="max-w-sm text-sm leading-6 text-light/58">
+              Premium AI automation for engineering teams that want speed, governance, and a calmer way to ship.
             </p>
-            <div className="flex items-center gap-4">
-              {/* Social Links placeholder using generic SVGs */}
-              {[1, 2, 3].map((i) => (
-                <a key={i} href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
-                  <Image src="/SVGs/link.svg" alt="Social" width={14} height={14} className="invert opacity-70" />
+            <div className="mt-6 flex items-center gap-3">
+              {["/SVGs/link.svg", "/SVGs/search.svg", "/SVGs/arrow-trending-up.svg"].map((src) => (
+                <a
+                  key={src}
+                  href="#hero"
+                  aria-label="CodeVista social link"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] transition hover:-translate-y-1 hover:border-accent-cyan/45 hover:bg-white/[0.08]"
+                >
+                  <Image src={src} alt="" width={15} height={15} className="invert opacity-70" />
                 </a>
               ))}
             </div>
           </div>
-          
-          <div>
-            <h4 className="font-mono font-semibold text-light mb-4">Product</h4>
-            <ul className="flex flex-col gap-2">
-              {["Features", "Integrations", "Pricing", "Changelog"].map(link => (
-                <li key={link}><a href="#" className="text-sm text-light/60 hover:text-accent-yellow transition-colors">{link}</a></li>
-              ))}
-            </ul>
-          </div>
 
-          <div>
-            <h4 className="font-mono font-semibold text-light mb-4">Company</h4>
-            <ul className="flex flex-col gap-2">
-              {["About Us", "Careers", "Blog", "Contact"].map(link => (
-                <li key={link}><a href="#" className="text-sm text-light/60 hover:text-accent-yellow transition-colors">{link}</a></li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-mono font-semibold text-light mb-4">Legal</h4>
-            <ul className="flex flex-col gap-2">
-              {["Privacy Policy", "Terms of Service", "Cookie Policy"].map(link => (
-                <li key={link}><a href="#" className="text-sm text-light/60 hover:text-accent-yellow transition-colors">{link}</a></li>
-              ))}
-            </ul>
-          </div>
+          {FOOTER_GROUPS.map((group) => (
+            <nav key={group.title} aria-label={group.title}>
+              <h2 className="mb-4 font-mono text-sm font-semibold text-light">{group.title}</h2>
+              <ul className="flex flex-col gap-3">
+                {group.links.map((link) => (
+                  <li key={link}>
+                    <a href="#hero" className="text-sm text-light/55 transition hover:text-accent-yellow">
+                      {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
         </div>
-        
-        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-light/40">
-            © {new Date().getFullYear()} CodeVista Inc. All rights reserved.
-          </p>
-          <div className="flex items-center gap-2 text-sm text-light/40">
-            <span>Built with precision for performance.</span>
-          </div>
+
+        <div className="mt-12 flex flex-col gap-4 border-t border-white/[0.08] pt-6 text-sm text-light/40 md:flex-row md:items-center md:justify-between">
+          <p>Copyright {new Date().getFullYear()} CodeVista AI. All rights reserved.</p>
+          <p className="font-mono">Built for accountable automation.</p>
         </div>
       </Container>
     </footer>

@@ -15,13 +15,13 @@ export function Button({
   children,
   ...props
 }: ButtonProps) {
-  const baseStyles = "inline-flex items-center justify-center font-medium transition-all duration-200 ease-out rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background";
+  const baseStyles = "inline-flex items-center justify-center gap-2 font-semibold transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background group active:scale-95";
   
   const variants = {
-    primary: "bg-accent-yellow text-background hover:bg-[#E5B400] focus:ring-accent-yellow",
-    secondary: "bg-secondary text-light hover:bg-[#0D3A45] focus:ring-secondary",
-    outline: "border-2 border-secondary text-light hover:bg-secondary focus:ring-secondary",
-    ghost: "text-light hover:bg-white/5 focus:ring-light",
+    primary: "bg-accent-yellow text-background hover:bg-[#ffe47a] hover:shadow-[0_0_34px_rgba(255,210,63,0.36)] hover:-translate-y-1 focus:ring-accent-yellow",
+    secondary: "bg-secondary text-light hover:bg-[#16808c] hover:shadow-[0_0_26px_rgba(93,226,231,0.25)] hover:-translate-y-1 focus:ring-secondary",
+    outline: "border border-white/20 text-light hover:bg-white/[0.08] hover:border-accent-cyan/50 hover:-translate-y-1 focus:ring-light",
+    ghost: "text-light hover:bg-white/10 hover:text-accent-yellow focus:ring-light",
   };
   
   const sizes = {
